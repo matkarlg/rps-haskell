@@ -1,0 +1,27 @@
+name:                rockpaperscissors
+version:             0.1.0.0
+synopsis:            Rock, paper, scissors game in Swedish.
+license:             BSD3
+license-file:        LICENSE
+author:              Mathias Karlgren
+copyright:           Copyright: (c) 2014 Mathias Karlgren
+category:            Game
+build-type:          Simple
+cabal-version:       >=1.18
+tested-with:         GHC==7.8.2
+homepage:            https://github.com/matkarlg/rps-haskell
+bug-reports:         https://github.com/matkarlg/rps-haskell/issues
+data-files:          README.md
+
+source-repository head
+  type:     git
+  location: git://github.com/matkarlg/rps-haskell.git
+
+executable rps-haskell
+  main-is:             Main.hs
+  build-depends:       base >= 4 && < 5,
+                       random
+
+  default-language:    Haskell2010
+
+  ghc-options:         -Wall -Werror -O2 -optl-s
