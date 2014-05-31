@@ -10,11 +10,6 @@ import System.Random (Random, random, randomR, randomIO)
 data Choice = Sten | Sax | Påse
   deriving (Bounded, Enum, Show)
 
--- randomIO c/o is derived from the typeclass. (See System.Random source)
--- 1. Send the boundaries of our datatype to randomR :: Choice.
--- 2. Call randomR :: Int with fromEnum.
--- 3. We receive a tuple with the random number and a generator (Int, RandomGen)
--- 4. Convert the random Int back into a Choice.
 instance Random Choice where
 -- random :: (Random a, RandomGen g) => g -> (a, g)
   random g = randomR (minBound, maxBound) g

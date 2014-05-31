@@ -1,4 +1,4 @@
-name:                rockpaperscissors
+name:                rps-haskell
 version:             0.1.0.0
 synopsis:            Rock, paper, scissors game in Swedish.
 license:             BSD3
