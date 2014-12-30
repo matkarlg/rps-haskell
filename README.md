@@ -1,7 +1,8 @@
 rps-haskell
 ===========
+[![Build Status](https://magnum.travis-ci.com/matkarlg/rps-haskell.svg?branch=master&token=snX8CDmwqxHQ4SNTodrq)](https://magnum.travis-ci.com/matkarlg/rps-haskell)
 
-[![Build Status](https://travis-ci.org/matkarlg/rps-haskell.svg?branch=master)](https://travis-ci.org/matkarlg/rps-haskell)
+String version (current branch)
+Text library version
 
-A small rock, paper and scissors game in Swedish, using haskell.
-Testing travis with this repo.
+Rock, paper & scissors game.
