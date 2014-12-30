@@ -8,7 +8,7 @@ copyright:           Copyright: (c) 2014 Mathias Karlgren
 category:            Game
 build-type:          Simple
 cabal-version:       >=1.18
-tested-with:         GHC==7.8.3, GHC==7.6.3, GHC==7.4.2, GHC==7.0.4
+tested-with:         GHC==7.8.3, GHC==7.6.3
 homepage:            https://github.com/matkarlg/rps-haskell
 bug-reports:         https://github.com/matkarlg/rps-haskell/issues
 data-files:          README.md
