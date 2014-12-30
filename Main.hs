@@ -1,22 +1,33 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module Main where
 
-import Control.Arrow (first)
-import Control.Monad (when)
-import Data.Char     (toLower)
-import Data.Maybe    (listToMaybe)
-import System.IO     (hFlush, stdout)
-import System.Random (Random, random, randomR, randomIO)
+import           Control.Applicative ((<$>))
+import           Control.Arrow       (first)
+import           Control.Monad.Loops (untilM_)
+import           Data.Char           (toLower, toUpper)
+import           Prelude             hiding (Show (..), print)
+import           System.IO           (hFlush, stdout)
+import           System.Random       (Random, random, randomIO, randomR)
+import           Text.Read           (readMaybe)
+import           Text.Show.Text
+import           Text.Show.Text.TH   (deriveShow)
+
+import           Data.Text           (Text)
+import qualified Data.Text           as T
+import qualified Data.Text.IO        as T
 
 data Choice = Sten | Sax | Påse
-  deriving (Bounded, Enum, Show)
+  deriving (Bounded, Enum, Read)
+$(deriveShow ''Choice)
 
 instance Random Choice where
 -- random :: (Random a, RandomGen g) => g -> (a, g)
   random g = randomR (minBound, maxBound) g
 
 -- randomR :: (Random a, RandomGen g) => (a,a) -> g -> (a, g)
-  randomR (minB, maxB) g =
-    first toEnum $ randomR (fromEnum minB, fromEnum maxB) g
+  randomR (a, b) g =
+    first toEnum $ randomR (fromEnum a, fromEnum b) g
 
 beats :: Choice -> Choice -> Bool
 beats Påse Sten = True
@@ -25,37 +36,38 @@ beats Sten Sax  = True
 beats _ _       = False
 
 getInput :: IO Choice
-getInput = input . map toLower =<< getLine
+getInput = do
+  input <- getLine
+  case readMaybe $ capitalizeWord input of
+    Just x  -> return x
+    Nothing -> T.putStrLn "Felstavning? Försök igen." >> getInput
+  where capitalizeWord [] = []
+        capitalizeWord (c:cs) = toUpper c : map toLower cs
 
-  where input :: String -> IO Choice
-        input "sten" = return Sten
-        input "sax"  = return Sax
-        input "påse" = return Påse
-        input _      = putStrLn "Felstavning? Försök igen." >>
-                       getInput
-
-play :: Choice -> Choice -> String
+play :: Choice -> Choice -> Text
 play p1 p2 | beats p1 p2 = "Du vann!"
            | beats p2 p1 = "Datorn vann."
            | otherwise   = "Oavgjort."
 
-putStrF :: String -> IO ()
-putStrF output = putStr output >> hFlush stdout
+yesno :: Text -> IO Bool
+yesno x = do
+  T.putStr x
+  hFlush stdout
+  input <- T.getLine
+  case T.toLower input of
+    "y" -> return True
+    _   -> return False
 
-yesno :: String -> IO Bool
-yesno prompt = do
-  putStrF prompt
-  input <- fmap listToMaybe getLine
-  case fmap toLower input of
-    Just 'y' -> return True
-    _        -> return False
+gameLoop :: IO ()
+gameLoop = do
+  T.putStr "Sten, sax eller påse? "
+  hFlush stdout
+  player   <- getInput
+  computer <- randomIO :: IO Choice
+  T.putStrLn $ show player `T.append` " VS " `T.append` show computer
+  T.putStrLn $ play player computer
 
 main :: IO ()
 main = do
-  putStrF "Sten, sax eller påse? "
-  player   <- getInput
-  computer <- randomIO :: IO Choice
-  putStrLn $ show player ++ " VS " ++ show computer
-  putStrLn $ play player computer
-  loopMain <- yesno "Igen? (y/N) "
-  when loopMain main
+  untilM_ gameLoop $ not <$> yesno "Igen? (y/N) "
+  putStrLn "Hej då"
