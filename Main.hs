@@ -31,7 +31,7 @@ getInput = do
   case readMaybe $ capitalizeWord input of
     Just x  -> return x
     Nothing -> putStrLn "Felstavning? Försök igen." >> getInput
-  where capitalizeWord [] = []
+  where capitalizeWord []     = []
         capitalizeWord (c:cs) = toUpper c : map toLower cs
 
 play :: Choice -> Choice -> String
