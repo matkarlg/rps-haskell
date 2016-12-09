@@ -24,9 +24,10 @@ gameStep = do
   put newScore
 
 addScore :: Result -> GameState -> StateT GameState IO GameState
-addScore Won  (won, draw, lost) = lift $ return (won + 1, draw, lost)
-addScore Draw (won, draw, lost) = lift $ return (won, draw + 1, lost)
-addScore Lost (won, draw, lost) = lift $ return (won, draw, lost + 1)
+addScore result (won, draw, lost) = case result of
+  Won  -> lift $ return (won + 1, draw, lost)
+  Draw -> lift $ return (won, draw + 1, lost)
+  Lost -> lift $ return (won, draw, lost + 1)
 
 displayScore :: GameState -> IO ()
 displayScore (won, draw, lost) =
