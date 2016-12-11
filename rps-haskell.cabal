@@ -21,8 +21,9 @@ source-repository head
 executable rps-haskell
   main-is:             Main.hs
   hs-source-dirs:      src
-  other-modules:       Game,
-                       Util
+  other-modules:       Rps.GameLogic,
+                       Rps.Scoreboard
+                       Rps.Utils
 
   build-depends:       base >= 4 && < 5,
                        mtl,

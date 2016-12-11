@@ -1,41 +1,37 @@
 module Main where
 
 import Control.Monad       (forever)
-import Control.Monad.Trans (lift)
+import Control.Monad.Trans (liftIO)
 import Control.Monad.State (StateT, evalStateT, get, put)
 import System.IO           (hFlush, stdout)
 import System.Random       (randomIO)
 
-import Game (Result(..), Choice, play)
-import Util (readLn')
+import Rps.GameLogic  (Result(..), Hand, playHands)
+import Rps.Scoreboard (GameState, displayScore, addScore)
+import Rps.Utils      (readLn')
 
-type GameState = (Int, Int, Int)
+gameLoop :: StateT GameState IO ()
+gameLoop = do
+  getScoreBoard <- get
 
-gameStep :: StateT GameState IO ()
-gameStep = do
-  lift $ putStr "Rock, Paper, Scissors? " >> hFlush stdout
-  player <- lift $ readLn' "Bad spelling, try again."
-  computer <- lift (randomIO :: IO Choice)
-  lift . putStrLn $ show player ++ " vs " ++ show computer
-  result <- lift . return $ play player computer
-  lift $ putStrLn ("You " ++ show result ++ "!")
-  newScore <- get >>= addScore result
-  lift $ displayScore newScore
-  put newScore
+  setScoreBoard <- liftIO $ do
+    result <- playRound
+    let scoreBoard = addScore result getScoreBoard
+    displayScore scoreBoard
+    return scoreBoard
 
-addScore :: Result -> GameState -> StateT GameState IO GameState
-addScore result (won, draw, lost) = case result of
-  Won  -> lift $ return (won + 1, draw, lost)
-  Draw -> lift $ return (won, draw + 1, lost)
-  Lost -> lift $ return (won, draw, lost + 1)
+  put setScoreBoard
 
-displayScore :: GameState -> IO ()
-displayScore (won, draw, lost) =
-  putStrLn $ unlines ["+-------+--------+--------+"
-                     ,"|  " ++ show Won ++ "  |  " ++ show Draw ++ "  |  " ++ show Lost ++ "  |"
-                     ,"+-------+--------+--------+"
-                     ,"|   " ++ show won ++ "   |    " ++ show draw ++ "   |    " ++ show lost ++ "   |"
-                     ,"+-------+--------+--------+"]
+playRound :: IO Result
+playRound = do
+  putStr "Rock, Paper, Scissors? "
+  hFlush stdout
+  player <- readLn' "Bad spelling, try again." :: IO Hand
+  computer <- randomIO :: IO Hand
+  let result = playHands player computer
+  putStrLn $ show player ++ " vs " ++ show computer ++ "\n"
+  putStrLn $ "You " ++ show result ++ "!"
+  return result
 
 main :: IO ()
-main = evalStateT (forever gameStep) (0, 0, 0)
+main = evalStateT (forever gameLoop) (0, 0, 0)

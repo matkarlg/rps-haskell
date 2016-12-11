@@ -1,4 +1,4 @@
-module Game where
+module Rps.GameLogic where
 
 import Control.Arrow (first)
 import System.Random (Random, random, randomR)
@@ -6,11 +6,11 @@ import System.Random (Random, random, randomR)
 data Result = Won | Draw | Lost
   deriving (Show)
 
-data Choice = Rock | Paper | Scissors
+data Hand = Rock | Paper | Scissors
   deriving (Bounded, Enum, Show, Read)
 
 {-# ANN module "HLint: ignore Eta reduce" #-}
-instance Random Choice where
+instance Random Hand where
 -- random :: (Random a, RandomGen g) => g -> (a, g)
   random g = randomR (minBound, maxBound) g
 
@@ -18,13 +18,13 @@ instance Random Choice where
   randomR (a, b) g =
     first toEnum $ randomR (fromEnum a, fromEnum b) g
 
-beats :: Choice -> Choice -> Bool
+beats :: Hand -> Hand -> Bool
 beats Paper Rock     = True
 beats Scissors Paper = True
 beats Rock Scissors  = True
 beats _ _            = False
 
-play :: Choice -> Choice -> Result
-play p1 p2 | beats p1 p2 = Won
-           | beats p2 p1 = Lost
-           | otherwise   = Draw
+playHands :: Hand -> Hand -> Result
+playHands p1 p2 | beats p1 p2 = Won
+                | beats p2 p1 = Lost
+                | otherwise   = Draw

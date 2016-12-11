@@ -1,4 +1,4 @@
-module Util where
+module Rps.Utils where
 
 import Data.Char (toLower, toUpper)
 import Text.Read (readMaybe)
